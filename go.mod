@@ -1,4 +1,4 @@
-module github.com/EliasSantiago/upload-s3
+module github.com/EliasSantiago/uploader-s3
 
 go 1.20
 
