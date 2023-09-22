@@ -27,7 +27,7 @@ type GinConfig struct {
 	Mode string `mapstructure:"GIN_MODE"`
 }
 
-// LoadConfig carrega as configurações do arquivo config.yaml
+// LoadConfig carrega todas as configurações do arquivo config.yaml
 func LoadConfig(path string) (*Configs, error) {
 	var config Configs
 	viper.SetConfigType("env")
@@ -42,4 +42,21 @@ func LoadConfig(path string) (*Configs, error) {
 	}
 
 	return &config, nil
+}
+
+// LoadAWSConfig carrega apenas as configurações da AWS
+func LoadAWSConfig(path string) (*AWSConfig, error) {
+	var awsConfig AWSConfig
+	viper.SetConfigType("env")
+	viper.AddConfigPath(path)
+	viper.SetConfigFile(".env")
+	viper.AutomaticEnv()
+	if err := viper.ReadInConfig(); err != nil {
+		return nil, err
+	}
+	if err := viper.Unmarshal(&awsConfig); err != nil {
+		return nil, err
+	}
+
+	return &awsConfig, nil
 }
