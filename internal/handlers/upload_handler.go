@@ -9,8 +9,8 @@ import (
 	"time"
 
 	s3Upload "github.com/EliasSantiago/uploader-s3/internal/s3"
-	conf "github.com/EliasSantiago/uploader-s3/pkg/configs"
 	"github.com/EliasSantiago/uploader-s3/pkg/logger"
+	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
@@ -26,11 +26,10 @@ type UploadRequest struct {
 	Files []*multipart.FileHeader `form:"files" binding:"required"`
 }
 
-func SetupRoutes(r *gin.Engine, awsConfig *conf.AWSConfig) {
+func SetupRoutes(r *gin.Engine, awsSession *s3.S3, awsBucketName string) {
 	r.POST("/api/v1/upload", func(c *gin.Context) {
 		log := logger.GetLogger()
 
-		sess := s3Upload.InitAWS(awsConfig)
 		uploadControl := make(chan struct{}, 100)
 		var req UploadRequest
 
@@ -67,7 +66,7 @@ func SetupRoutes(r *gin.Engine, awsConfig *conf.AWSConfig) {
 						continue
 					}
 
-					if err := s3Upload.UploadFile(s3Path, uploadControl, c, fileBytes, awsConfig, sess); err == nil {
+					if err := s3Upload.UploadFile(s3Path, uploadControl, c, fileBytes, awsSession, awsBucketName); err == nil {
 						return
 					}
 				}

@@ -2,14 +2,16 @@ package main
 
 import (
 	"github.com/EliasSantiago/uploader-s3/internal/app"
+	"github.com/EliasSantiago/uploader-s3/internal/s3"
 	config "github.com/EliasSantiago/uploader-s3/pkg/configs"
 	"github.com/EliasSantiago/uploader-s3/pkg/logger"
+	"go.uber.org/zap"
 )
 
 func init() {
 	err := logger.SetupLogger()
 	if err != nil {
-		panic("Erro ao configurar o logger: " + err.Error())
+		panic("Error setting up logger: " + err.Error())
 	}
 }
 
@@ -18,5 +20,14 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	app.Initialize(awsConfig)
+
+	awsSession, err := s3.InitAWS(awsConfig)
+	if err != nil {
+		logger.Error("Error initializing AWS session", err,
+			zap.String("journey", "InitAWS"),
+		)
+		panic(err)
+	}
+
+	app.Initialize(awsSession, awsConfig.S3Bucket)
 }

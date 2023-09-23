@@ -8,17 +8,26 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 )
 
-var S3Client *s3.S3
+var (
+	S3Client   *s3.S3
+	awsSession *session.Session
+)
 
-func InitAWS(awsConfig *config.AWSConfig) *s3.S3 {
-	sess, err := session.NewSession(
-		&aws.Config{
-			Region:      aws.String(awsConfig.Region),
-			Credentials: credentials.NewStaticCredentials(awsConfig.AccessKey, awsConfig.SecretKey, ""),
-		})
-	if err != nil {
-		panic(err)
+func InitAWS(awsConfig *config.AWSConfig) (*s3.S3, error) {
+	if S3Client != nil {
+		return S3Client, nil
 	}
 
-	return s3.New(sess)
+	awsCfg := &aws.Config{
+		Region:      aws.String(awsConfig.Region),
+		Credentials: credentials.NewStaticCredentials(awsConfig.AccessKey, awsConfig.SecretKey, ""),
+	}
+
+	sess, err := session.NewSession(awsCfg)
+	if err != nil {
+		return nil, err
+	}
+
+	S3Client = s3.New(sess)
+	return S3Client, nil
 }
