@@ -28,14 +28,13 @@ type UploadRequest struct {
 
 func SetupRoutes(r *gin.Engine, awsSession *s3.S3, awsBucketName string) {
 	r.POST("/api/v1/upload", func(c *gin.Context) {
-		log := logger.GetLogger()
+		// log := logger.GetLogger()
 
 		uploadControl := make(chan struct{}, 100)
 		var req UploadRequest
 
 		if err := c.ShouldBind(&req); err != nil {
-			log.Error("Error parsing request body",
-				zap.Error(err),
+			logger.Error("Error parsing request body", err,
 				zap.String("journey", "ShouldBindJSON"),
 			)
 			c.JSON(http.StatusBadRequest, gin.H{
@@ -58,8 +57,7 @@ func SetupRoutes(r *gin.Engine, awsSession *s3.S3, awsBucketName string) {
 				for i := 0; i < maxRetries; i++ {
 					fileBytes, err := s3Upload.RetryUpload(file)
 					if err != nil {
-						log.Error("Error reading file... %s\n",
-							zap.Error(err),
+						logger.Error("Error reading file.", err,
 							zap.String("journey", "RetryUpload"),
 						)
 						time.Sleep(2 * time.Second)

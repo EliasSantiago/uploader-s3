@@ -1,35 +1,38 @@
 package logger
 
 import (
+	"os"
+	"strings"
+
+	"github.com/spf13/viper"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
 
 var (
 	log *zap.Logger
+
+	LOG_OUTPUT = "LOG_OUTPUT"
+	LOG_LEVEL  = "LOG_LEVEL"
 )
 
 // InitLogger inicializa o logger
-func InitLogger(output string, level string) {
+func init() {
 	logConfig := zap.Config{
-		OutputPaths: []string{output},
-		Level:       zap.NewAtomicLevelAt(getLevelLogs(level)),
+		OutputPaths: []string{getOutputLogs()},
+		Level:       zap.NewAtomicLevelAt(getLevelLogs()),
 		Encoding:    "json",
 		EncoderConfig: zapcore.EncoderConfig{
 			LevelKey:     "level",
 			TimeKey:      "time",
-			MessageKey:   "msg",
+			MessageKey:   "message",
 			EncodeTime:   zapcore.ISO8601TimeEncoder,
 			EncodeLevel:  zapcore.LowercaseLevelEncoder,
 			EncodeCaller: zapcore.ShortCallerEncoder,
 		},
 	}
 
-	logger, err := logConfig.Build()
-	if err != nil {
-		panic(err)
-	}
-	log = logger
+	log, _ = logConfig.Build()
 }
 
 // Info registra uma mensagem de informação
@@ -45,8 +48,16 @@ func Error(message string, err error, tags ...zap.Field) {
 	log.Sync()
 }
 
-func getLevelLogs(level string) zapcore.Level {
-	switch level {
+func getOutputLogs() string {
+	output := strings.ToLower(strings.TrimSpace(viper.GetString(LOG_OUTPUT)))
+	if output == "" {
+		return "stdout"
+	}
+	return output
+}
+
+func getLevelLogs() zapcore.Level {
+	switch strings.ToLower(strings.TrimSpace(os.Getenv(LOG_LEVEL))) {
 	case "info":
 		return zapcore.InfoLevel
 	case "error":
@@ -56,19 +67,4 @@ func getLevelLogs(level string) zapcore.Level {
 	default:
 		return zapcore.InfoLevel
 	}
-}
-
-func SetupLogger() error {
-	config := zap.NewDevelopmentConfig()
-	config.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
-	logger, err := config.Build()
-	if err != nil {
-		return err
-	}
-	log = logger
-	return nil
-}
-
-func GetLogger() *zap.Logger {
-	return log
 }

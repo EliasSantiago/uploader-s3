@@ -2,7 +2,6 @@ package s3
 
 import (
 	"bytes"
-	"fmt"
 
 	"github.com/EliasSantiago/uploader-s3/pkg/logger"
 	"github.com/aws/aws-sdk-go/service/s3"
@@ -24,11 +23,15 @@ func UploadFile(filename string, uploadControl <-chan struct{}, c *gin.Context, 
 		Body:   bytes.NewReader(fileBytes),
 	})
 	if err != nil {
-		logger.Error("Error uploading file", err,
+		logger.Error("Error uploading file",
+			err,
 			zap.String("journey", "s3Client.PutObject"),
 		)
 		return err
 	}
-	fmt.Printf("File %s uploaded successfully to bucket %s\n", filename, bucketName)
+	logger.Info("File uploaded successfully",
+		zap.String("filename", filename),
+		zap.String("bucket", bucketName),
+	)
 	return nil
 }

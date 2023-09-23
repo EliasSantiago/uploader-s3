@@ -4,13 +4,11 @@ import (
 	"github.com/spf13/viper"
 )
 
-type Configs struct {
-	AWS  AWSConfig
-	LOGS LogsConfig
-	GIN  GinConfig
+type Config struct {
+	Mode string `mapstructure:"GIN_MODE"`
+	Port string `mapstructure:"GIN_PORT"`
 }
 
-// AWSConfig representa as configurações da AWS
 type AWSConfig struct {
 	Region    string `mapstructure:"AWS_REGION"`
 	AccessKey string `mapstructure:"AWS_ACCESS_KEY"`
@@ -23,13 +21,8 @@ type LogsConfig struct {
 	LogLevel  string `mapstructure:"LOG_LEVEL"`
 }
 
-type GinConfig struct {
-	Mode string `mapstructure:"GIN_MODE"`
-}
-
-// LoadConfig carrega todas as configurações do arquivo config.yaml
-func LoadConfig(path string) (*Configs, error) {
-	var config Configs
+func LoadConfig(path string) (*Config, error) {
+	var config Config
 	viper.SetConfigType("env")
 	viper.AddConfigPath(path)
 	viper.SetConfigFile(".env")

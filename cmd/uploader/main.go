@@ -8,14 +8,15 @@ import (
 	"go.uber.org/zap"
 )
 
-func init() {
-	err := logger.SetupLogger()
-	if err != nil {
-		panic("Error setting up logger: " + err.Error())
-	}
-}
-
 func main() {
+	cfg, err := config.LoadConfig(".")
+	if err != nil {
+		logger.Error("Error loading config", err,
+			zap.String("journey", "LoadConfig"),
+		)
+		panic(err)
+	}
+
 	awsConfig, err := config.LoadAWSConfig(".")
 	if err != nil {
 		panic(err)
@@ -29,5 +30,5 @@ func main() {
 		panic(err)
 	}
 
-	app.Initialize(awsSession, awsConfig.S3Bucket)
+	app.Initialize(cfg, awsSession, awsConfig.S3Bucket)
 }
