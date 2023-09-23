@@ -4,7 +4,6 @@
 Esta é uma API REST simples para facilitar o upload de arquivos no Amazon S3. A API permite que os usuários enviem arquivos para um bucket do Amazon S3 com facilidade, fornecendo um caminho de arquivo personalizado.
 
 
-
 **Tecnologias Utilizadas**
 * Golang: A linguagem de programação Go foi escolhida para desenvolver a API devido à sua eficiência, desempenho e facilidade de uso.
 * Gin: O framework web Gin foi usado para simplificar o roteamento e o tratamento de solicitações HTTP.
@@ -12,7 +11,6 @@ Esta é uma API REST simples para facilitar o upload de arquivos no Amazon S3. A
 * AWS SDK para Go: A biblioteca oficial da Amazon para Go foi usada para interagir com o Amazon S3.
 * Viper: A biblioteca Viper foi utilizada para carregar configurações a partir de um arquivo .env, facilitando a configuração da aplicação.
 * Zap: A biblioteca Zap foi usada para configuração de log robusta e eficiente.
-
 
 **Funcionalidades Principais**
 
@@ -22,7 +20,7 @@ Esta é uma API REST simples para facilitar o upload de arquivos no Amazon S3. A
 
 **Configuração**
 
-Certifique-se de configurar corretamente as variáveis de ambiente no arquivo .env. Você pode usar o seguinte formato como exemplo:
+Certifique-se de configurar corretamente as variáveis de ambiente no arquivo .env no diretório /cmd/uploader. Você pode usar o seguinte formato como exemplo:
 
 * AWS_REGION=us-east-1
 * AWS_ACCESS_KEY=seu-access-key
@@ -36,10 +34,15 @@ Certifique-se de configurar corretamente as variáveis de ambiente no arquivo .e
 
 Clone este repositório:
 
-* cd uploader-s3/cmd/uploader
-* Configure as variáveis de ambiente no arquivo .env conforme descrito na seção de configuração. Mantenha o .env dentro de /cmd/uploader
+* Instale as dependências:
+```
+go mod tidy
+```
 
-* No diretório /cmd/uploader execute o seguinte comando para iniciar a aplicação: **go run main.go**
+* No diretório /cmd/uploader execute o seguinte comando para iniciar a aplicação:
+```
+go run main.go
+```
 
 **A API estará disponível em http://localhost:8080**
 
@@ -48,7 +51,7 @@ Clone este repositório:
 Envie uma solicitação POST para http://localhost:8080/api/v1/upload com o arquivo que deseja enviar. Certifique-se de incluir o campo "path" no corpo da solicitação para personalizar o caminho do arquivo no bucket S3.
 
 **Exemplo de corpo da solicitação:**
-~~~javascript
+```javascript
 var formdata = new FormData();
 formdata.append("path", "user/avatar");
 formdata.append("files", fileInput.files[0], "download.png");
@@ -63,7 +66,7 @@ fetch("http://localhost:8080/api/v1/upload", requestOptions)
   .then(response => response.text())
   .then(result => console.log(result))
   .catch(error => console.log('error', error));
-~~~
+```
 
 **Contribuição**
 
